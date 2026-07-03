@@ -2,12 +2,16 @@
 // Cachea los archivos de la app para que funcione sin internet
 // y para que el navegador la reconozca como instalable (PWA).
 
-const CACHE_NAME = 'mis-finanzas-v1'; // sube este número (v2, v3...) cada vez que publiques cambios grandes
+const CACHE_NAME = 'mis-finanzas-v2'; // sube este número (v2, v3...) cada vez que publiques cambios grandes
 
 const ARCHIVOS_CACHE = [
   './',
   './index.html',
   './app.js',
+  './pwa-extra.js',
+  './recordatorios.js',
+  './cuentas.js',
+  './sync-firebase.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
