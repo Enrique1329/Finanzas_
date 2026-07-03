@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mis Finanzas</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1E1E20">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   /* ===================== TEMAS (variables CSS) ===================== */
@@ -337,6 +339,36 @@
 
         <section class="space-y-2 mb-8" id="categorias-list"></section>
 
+        <section class="t-card border rounded-2xl p-6 mb-8">
+          <h2 class="text-sm font-semibold t-text-soft mb-1">Presupuestos mensuales</h2>
+          <p class="text-xs t-text-faint mb-4">Ponle un límite a cada categoría. Te avisamos si te acercás o te pasás.</p>
+          <div id="presupuestos-list"></div>
+        </section>
+
+        <section class="t-card border rounded-2xl p-4 mb-8 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium">Notificaciones</p>
+            <p class="text-xs t-text-faint">Avisos de presupuesto (solo con la app abierta).</p>
+          </div>
+          <button id="btn-activar-notificaciones" class="px-3 py-1.5 rounded-lg t-btn-primary text-xs font-medium">Activar</button>
+        </section>
+
+        <section class="t-card border rounded-2xl p-6 mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-semibold t-text-soft">Cuentas</h2>
+            <button id="btn-nueva-cuenta" class="text-xs px-3 py-1.5 rounded-lg t-btn-primary font-medium">+ Nueva</button>
+          </div>
+          <div id="cuentas-list"></div>
+        </section>
+
+        <section class="t-card border rounded-2xl p-6 mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-semibold t-text-soft">Pagos recurrentes</h2>
+            <button id="btn-nuevo-recordatorio" class="text-xs px-3 py-1.5 rounded-lg t-btn-primary font-medium">+ Nuevo</button>
+          </div>
+          <div id="recordatorios-list"></div>
+        </section>
+
       </section>
 
     </main>
@@ -382,7 +414,8 @@
         <option value="">Selecciona una categoría</option>
       </select>
       <p id="error-categoria" class="text-xs text-red-500 mb-4 hidden">Debes elegir una categoría</p>
-
+      <label class="block text-sm font-medium mb-1">Cuenta</label>
+ <select id="txn-cuenta" class="w-full px-3 py-2.5 rounded-lg border t-input text-sm mb-4 focus:ring-2 focus:ring-gray-900"></select>
       <label class="block text-sm font-medium mb-1">Fecha</label>
       <input type="date" id="txn-fecha" class="w-full px-3 py-2.5 rounded-lg border t-input text-sm mb-1 focus:ring-2 focus:ring-gray-900" />
       <p id="error-fecha" class="text-xs text-red-500 mb-4 hidden">La fecha es obligatoria</p>
@@ -506,5 +539,11 @@
 
 
   <script src="app.js"></script>
+  <script src="pwa-extra.js"></script>
+  <script src="recordatorios.js"></script>
+  <script src="cuentas.js"></script>
+
+
+  
 </body>
 </html>
