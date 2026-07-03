@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Finanzas — Mockup</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: 'Inter', -apple-system, sans-serif; background:#FAFAF8; color:#1A1A1A; }
+  .donut-ring {
+    background: conic-gradient(
+      #F59E0B 0deg 130deg,
+      #3B82F6 130deg 200deg,
+      #8B5CF6 200deg 260deg,
+      #6B7280 260deg 360deg
+    );
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+  <div class="flex">
+
+    <!-- SIDEBAR (escritorio) -->
+    <aside class="hidden md:flex md:flex-col w-60 h-screen sticky top-0 border-r border-gray-200 px-6 py-8">
+      <div class="text-xl font-extrabold mb-10 tracking-tight">💰 Finanzas</div>
+      <nav class="flex flex-col gap-1 text-sm">
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-900 text-white font-medium">
+          <span>📊</span> Dashboard
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 font-medium">
+          <span>📋</span> Historial
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 font-medium">
+          <span>🏷️</span> Categorías
+        </a>
+      </nav>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 px-5 md:px-10 py-8 pb-24 md:pb-8 max-w-3xl mx-auto w-full">
+
+      <!-- HEADER: SALDO (titular financiero, sin caja) -->
+      <section class="mb-8">
+        <p class="text-sm text-gray-500 mb-1">Saldo total</p>
+        <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight">$1,247.50</h1>
+        <div class="flex gap-6 mt-4 text-sm">
+          <div>
+            <span class="inline-block w-2 h-2 rounded-full bg-[#10A37F] mr-1.5"></span>
+            <span class="text-gray-500">Ingresos:</span>
+            <span class="font-semibold text-[#10A37F]">$2,100.00</span>
+          </div>
+          <div>
+            <span class="inline-block w-2 h-2 rounded-full bg-[#EF4444] mr-1.5"></span>
+            <span class="text-gray-500">Gastos:</span>
+            <span class="font-semibold text-[#EF4444]">$852.50</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- DONUT CHART + LEYENDA (elemento firma) -->
+      <section class="bg-white border border-gray-200 rounded-2xl p-6 mb-8 flex items-center gap-8">
+        <div class="relative w-32 h-32 rounded-full donut-ring flex items-center justify-center shrink-0">
+          <div class="w-20 h-20 rounded-full bg-white flex flex-col items-center justify-center">
+            <span class="text-[10px] text-gray-400">Este mes</span>
+            <span class="text-sm font-bold">$852.50</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-2 text-sm">
+          <div class="flex justify-between"><span><span class="inline-block w-2 h-2 rounded-full bg-[#F59E0B] mr-2"></span>Comida</span><span class="font-medium">$420.00</span></div>
+          <div class="flex justify-between"><span><span class="inline-block w-2 h-2 rounded-full bg-[#3B82F6] mr-2"></span>Transporte</span><span class="font-medium">$180.00</span></div>
+          <div class="flex justify-between"><span><span class="inline-block w-2 h-2 rounded-full bg-[#8B5CF6] mr-2"></span>Entretenimiento</span><span class="font-medium">$140.00</span></div>
+          <div class="flex justify-between"><span><span class="inline-block w-2 h-2 rounded-full bg-[#6B7280] mr-2"></span>Otros</span><span class="font-medium">$112.50</span></div>
+        </div>
+      </section>
+
+      <!-- FILTROS -->
+      <section class="flex gap-2 mb-4 overflow-x-auto">
+        <button class="px-4 py-1.5 rounded-full bg-gray-900 text-white text-sm font-medium whitespace-nowrap">Mes actual</button>
+        <button class="px-4 py-1.5 rounded-full border border-gray-200 text-gray-600 text-sm font-medium whitespace-nowrap">Mes anterior</button>
+        <button class="px-4 py-1.5 rounded-full border border-gray-200 text-gray-600 text-sm font-medium whitespace-nowrap">Todas las categorías</button>
+      </section>
+
+      <!-- HISTORIAL -->
+      <section>
+        <h2 class="text-sm font-semibold text-gray-500 mb-3">Transacciones recientes</h2>
+        <div class="space-y-2">
+
+          <div class="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center">🍔</div>
+              <div>
+                <p class="font-medium text-sm">Almuerzo con cliente</p>
+                <p class="text-xs text-gray-400">Comida · 28 Jun</p>
+              </div>
+            </div>
+            <span class="font-semibold text-[#EF4444] text-sm">-$25.50</span>
+          </div>
+
+          <div class="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center">💼</div>
+              <div>
+                <p class="font-medium text-sm">Pago quincenal</p>
+                <p class="text-xs text-gray-400">Salario · 25 Jun</p>
+              </div>
+            </div>
+            <span class="font-semibold text-[#10A37F] text-sm">+$500.00</span>
+          </div>
+
+          <div class="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center">🚗</div>
+              <div>
+                <p class="font-medium text-sm">Gasolina</p>
+                <p class="text-xs text-gray-400">Transporte · 24 Jun</p>
+              </div>
+            </div>
+            <span class="font-semibold text-[#EF4444] text-sm">-$30.00</span>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- BOTÓN FLOTANTE AGREGAR -->
+  <button class="fixed bottom-20 md:bottom-8 right-6 w-14 h-14 rounded-full bg-gray-900 text-white text-2xl shadow-lg flex items-center justify-center hover:bg-gray-800 transition">
+    +
+  </button>
+
+  <!-- NAV INFERIOR (móvil) -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3">
+    <button class="flex flex-col items-center text-xs gap-1 text-gray-900 font-medium">📊 Dashboard</button>
+    <button class="flex flex-col items-center text-xs gap-1 text-gray-400">📋 Historial</button>
+    <button class="flex flex-col items-center text-xs gap-1 text-gray-400">🏷️ Categorías</button>
+  </nav>
+
+</body>
+</html>

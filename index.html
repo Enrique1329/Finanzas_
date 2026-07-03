@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Finanzas</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* ===================== TEMAS (variables CSS) ===================== */
+  :root, [data-theme="claro"] {
+    --bg: #FAFAF8;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F3F4F6;
+    --bg-active: #1A1A1A;
+    --text: #1A1A1A;
+    --text-soft: #6B7280;
+    --text-faint: #9CA3AF;
+    --border: #E5E7EB;
+    --accent-ingreso: #10A37F;
+    --accent-gasto: #EF4444;
+    --on-active: #FFFFFF;
+  }
+
+  [data-theme="oscuro"] {
+    --bg: #1E1E20;
+    --bg-card: #2A2A2D;
+    --bg-hover: #343437;
+    --bg-active: #FFFFFF;
+    --text: #ECECEC;
+    --text-soft: #A3A3A6;
+    --text-faint: #6F6F73;
+    --border: #3A3A3D;
+    --accent-ingreso: #2DD4A8;
+    --accent-gasto: #F87171;
+    --on-active: #1E1E20;
+  }
+
+  [data-theme="medianoche"] {
+    --bg: #0B0F1A;
+    --bg-card: #131826;
+    --bg-hover: #1C2333;
+    --bg-active: #5B8CFF;
+    --text: #E3E7F1;
+    --text-soft: #8A93A8;
+    --text-faint: #57607A;
+    --border: #232B40;
+    --accent-ingreso: #34D399;
+    --accent-gasto: #FB7185;
+    --on-active: #FFFFFF;
+  }
+
+  [data-theme="bosque"] {
+    --bg: #F4F7F2;
+    --bg-card: #FFFFFF;
+    --bg-hover: #E9F0E5;
+    --bg-active: #2F5D3A;
+    --text: #1E2A1F;
+    --text-soft: #5C6B5D;
+    --text-faint: #93A293;
+    --border: #DCE5D9;
+    --accent-ingreso: #2F8F5B;
+    --accent-gasto: #C75C4D;
+    --on-active: #FFFFFF;
+  }
+
+  [data-theme="arena"] {
+    --bg: #FAF6EF;
+    --bg-card: #FFFCF7;
+    --bg-hover: #F0E9DA;
+    --bg-active: #8A5A2E;
+    --text: #2B2117;
+    --text-soft: #7A6A56;
+    --text-faint: #B0A28C;
+    --border: #E8DCC6;
+    --accent-ingreso: #4F8A5B;
+    --accent-gasto: #B4533F;
+    --on-active: #FFFCF7;
+  }
+
+  /* ===================== ESTILOS BASE ===================== */
+  body { font-family: 'Inter', -apple-system, sans-serif; background:var(--bg); color:var(--text); transition: background 0.2s ease, color 0.2s ease; }
+  .donut-ring { transition: background 0.3s ease; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .modal-overlay { display: none; }
+  .modal-overlay.active { display: flex; }
+  input:focus, select:focus { outline: none; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Utilidades temáticas */
+  .t-bg { background: var(--bg); }
+  .t-card { background: var(--bg-card); border-color: var(--border); }
+  .t-border { border-color: var(--border); }
+  .t-text { color: var(--text); }
+  .t-text-soft { color: var(--text-soft); }
+  .t-text-faint { color: var(--text-faint); }
+  .t-hover:hover { background: var(--bg-hover); }
+  .t-active { background: var(--bg-active); color: var(--on-active); }
+  .t-input { background: var(--bg-card); border-color: var(--border); color: var(--text); }
+  .t-input::placeholder { color: var(--text-faint); }
+  .t-pill { border-color: var(--border); color: var(--text-soft); background: var(--bg-card); }
+  .t-btn-primary { background: var(--bg-active); color: var(--on-active); }
+  .t-btn-primary:hover { opacity: 0.88; }
+  .t-modal-card { background: var(--bg-card); }
+  .t-toast { background: var(--bg-active); color: var(--on-active); }
+  .t-ingreso { color: var(--accent-ingreso); }
+  .t-gasto { color: var(--accent-gasto); }
+  .dot-ingreso { background: var(--accent-ingreso); }
+  .dot-gasto { background: var(--accent-gasto); }
+
+  .theme-swatch { width: 26px; height: 26px; border-radius: 9999px; cursor: pointer; border: 2px solid transparent; transition: transform 0.15s ease; padding:0; }
+  .theme-swatch:hover { transform: scale(1.1); }
+  .theme-swatch.active { border-color: var(--text); }
+</style>
+</head>
+<body class="min-h-screen">
+
+  <div class="flex">
+
+    <!-- SIDEBAR (escritorio) -->
+    <aside class="hidden md:flex md:flex-col w-60 h-screen sticky top-0 t-border border-r px-6 py-8">
+      <div class="text-xl font-extrabold mb-10 tracking-tight">💰 Finanzas</div>
+      <nav class="flex flex-col gap-1 text-sm" id="sidebar-nav">
+        <a data-view="dashboard" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium cursor-pointer t-hover t-text-soft">
+          <span>📊</span> Dashboard
+        </a>
+        <a data-view="historial" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium cursor-pointer t-hover t-text-soft">
+          <span>📋</span> Historial
+        </a>
+        <a data-view="categorias" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium cursor-pointer t-hover t-text-soft">
+          <span>🏷️</span> Categorías
+        </a>
+      </nav>
+
+      <div class="mt-auto">
+        <p class="text-xs t-text-faint font-semibold uppercase tracking-wide mb-2">Tema</p>
+        <div class="flex gap-2 flex-wrap mb-5" id="theme-switcher"></div>
+        <p class="text-xs t-text-faint font-semibold uppercase tracking-wide mb-2">Datos</p>
+        <div class="flex flex-col gap-1.5">
+          <button id="btn-exportar" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium t-hover t-text-soft">
+            <span>📤</span> Exportar backup
+          </button>
+          <label id="label-importar" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium t-hover t-text-soft cursor-pointer">
+            <span>📥</span> Importar backup
+            <input type="file" id="input-importar" accept=".json" class="hidden" />
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 px-5 md:px-10 py-8 pb-24 md:pb-8 max-w-3xl mx-auto w-full">
+
+      <!-- SELECTOR DE TEMA (solo móvil, escritorio lo tiene en el sidebar) -->
+      <div class="md:hidden flex items-center justify-between gap-2 mb-4">
+        <div class="flex items-center gap-2" id="theme-switcher-mobile"></div>
+        <div class="flex gap-2">
+          <button id="btn-exportar-mobile" class="text-xs t-text-soft t-hover px-2 py-1.5 rounded-lg border t-border">📤</button>
+          <label class="text-xs t-text-soft t-hover px-2 py-1.5 rounded-lg border t-border cursor-pointer">
+            📥<input type="file" id="input-importar-mobile" accept=".json" class="hidden" />
+          </label>
+        </div>
+      </div>
+
+      <!-- ===================== VISTA: DASHBOARD ===================== -->
+      <section id="view-dashboard" class="view active">
+
+        <section class="mb-8">
+          <p class="text-sm t-text-soft mb-1">Saldo total</p>
+          <h1 id="saldo-total" class="text-5xl md:text-6xl font-extrabold tracking-tight">$0.00</h1>
+          <div class="flex gap-6 mt-4 text-sm">
+            <div>
+              <span class="inline-block w-2 h-2 rounded-full dot-ingreso mr-1.5"></span>
+              <span class="t-text-soft">Ingresos:</span>
+              <span id="total-ingresos" class="font-semibold t-ingreso">$0.00</span>
+            </div>
+            <div>
+              <span class="inline-block w-2 h-2 rounded-full dot-gasto mr-1.5"></span>
+              <span class="t-text-soft">Gastos:</span>
+              <span id="total-gastos" class="font-semibold t-gasto">$0.00</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- META DE AHORRO -->
+        <section class="t-card border rounded-2xl p-6 mb-8" id="meta-card">
+          <div id="meta-vacia" class="text-center py-2">
+            <p class="text-2xl mb-2">🎯</p>
+            <p class="text-sm t-text-soft mb-3">Aún no tienes una meta de ahorro.</p>
+            <button id="btn-crear-meta" class="px-4 py-2 rounded-xl t-btn-primary text-sm font-medium">Crear meta</button>
+          </div>
+
+          <div id="meta-activa" class="hidden">
+            <div class="flex items-center justify-between mb-1">
+              <p class="text-sm t-text-soft">Meta: <span id="meta-nombre" class="font-semibold t-text"></span></p>
+              <button id="btn-editar-meta" class="text-xs t-text-faint hover:opacity-70">✏️ Editar</button>
+            </div>
+            <div class="flex items-end justify-between mb-2">
+              <span id="meta-actual" class="text-2xl font-extrabold">$0.00</span>
+              <span id="meta-objetivo" class="text-sm t-text-faint">de $0.00</span>
+            </div>
+            <div class="w-full h-2.5 rounded-full t-border" style="background:var(--bg-hover)">
+              <div id="meta-barra" class="h-2.5 rounded-full dot-ingreso transition-all" style="width:0%"></div>
+            </div>
+            <div class="flex items-center justify-between mt-2 text-xs t-text-faint">
+              <span id="meta-porcentaje">0%</span>
+              <span id="meta-fecha"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONFIGURACIÓN DE AHORRO AUTOMÁTICO -->
+        <section class="t-card border rounded-2xl p-4 mb-8 flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium">Ahorro automático al recibir ingresos</p>
+            <p class="text-xs t-text-faint">Te preguntaremos si quieres apartar un % de cada ingreso para tu meta.</p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0 ml-4">
+            <input type="number" id="ahorro-porcentaje" min="0" max="100" placeholder="10"
+              class="w-16 px-2 py-1.5 rounded-lg border t-input text-sm text-center" />
+            <span class="text-sm t-text-soft">%</span>
+          </div>
+        </section>
+
+        <!-- DISTRIBUCIÓN 50/30/20 -->
+        <section class="t-card border rounded-2xl p-6 mb-8">
+          <h2 class="text-sm font-semibold t-text-soft mb-4">Distribución 50/30/20 (este mes)</h2>
+          <div id="distribucion-50-30-20"></div>
+        </section>
+
+        <section class="t-card border rounded-2xl p-6 mb-8 flex items-center gap-8">
+          <div class="relative w-32 h-32 rounded-full donut-ring flex items-center justify-center shrink-0" id="donut-chart" style="background:var(--border)">
+            <div class="w-20 h-20 rounded-full t-card flex flex-col items-center justify-center">
+              <span class="text-[10px] t-text-faint">Este mes</span>
+              <span id="donut-total" class="text-sm font-bold">$0.00</span>
+            </div>
+          </div>
+          <div class="flex-1 space-y-2 text-sm" id="donut-legend">
+            <p class="t-text-faint text-xs">Sin gastos este mes todavía.</p>
+          </div>
+        </section>
+
+        <section class="t-card border rounded-2xl p-6 mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-semibold t-text-soft">Tendencia (últimos 6 meses)</h2>
+            <div class="flex gap-4 text-xs">
+              <span><span class="inline-block w-2 h-2 rounded-full dot-ingreso mr-1"></span>Ingresos</span>
+              <span><span class="inline-block w-2 h-2 rounded-full dot-gasto mr-1"></span>Gastos</span>
+            </div>
+          </div>
+          <div class="relative h-48" id="tendencia-chart-wrap">
+            <svg id="tendencia-chart" viewBox="0 0 600 192" preserveAspectRatio="none" class="w-full h-full"></svg>
+          </div>
+          <p id="tendencia-empty" class="t-text-faint text-xs text-center py-12 hidden">Aún no hay suficientes datos para mostrar una tendencia.</p>
+        </section>
+
+        <!-- ALERTAS DE GASTOS HORMIGA -->
+        <section id="alertas-hormiga" class="space-y-2 mb-8"></section>
+
+        <section>
+          <h2 class="text-sm font-semibold t-text-soft mb-3">Transacciones recientes</h2>
+          <div class="space-y-2" id="recientes-list"></div>
+        </section>
+
+      </section>
+
+      <!-- ===================== VISTA: HISTORIAL ===================== -->
+      <section id="view-historial" class="view">
+
+        <section class="mb-6 flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-extrabold tracking-tight">Historial</h1>
+            <p class="text-sm t-text-soft"><span id="historial-count">0</span> transacciones registradas</p>
+          </div>
+        </section>
+
+        <section class="mb-4">
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 t-text-faint">🔍</span>
+            <input type="text" id="buscador" placeholder="Buscar por nota, categoría..."
+              class="w-full pl-9 pr-4 py-2.5 rounded-xl border t-input text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent" />
+          </div>
+        </section>
+
+        <section class="flex flex-wrap gap-2 mb-4">
+          <select id="filtro-tipo" class="px-3 py-1.5 rounded-full border t-pill text-sm font-medium">
+            <option value="todos">Todos los tipos</option>
+            <option value="ingreso">Solo ingresos</option>
+            <option value="gasto">Solo gastos</option>
+          </select>
+          <select id="filtro-categoria" class="px-3 py-1.5 rounded-full border t-pill text-sm font-medium">
+            <option value="todas">Todas las categorías</option>
+          </select>
+          <select id="filtro-mes" class="px-3 py-1.5 rounded-full border t-pill text-sm font-medium">
+            <option value="todos">Todas las fechas</option>
+            <option value="actual">Mes actual</option>
+            <option value="anterior">Mes anterior</option>
+            <option value="personalizado">Rango personalizado...</option>
+          </select>
+        </section>
+
+        <section id="rango-personalizado" class="hidden flex flex-wrap gap-2 mb-4 items-center">
+          <label class="text-xs t-text-soft">Desde</label>
+          <input type="date" id="rango-desde" class="px-3 py-1.5 rounded-lg border t-input text-sm" />
+          <label class="text-xs t-text-soft">Hasta</label>
+          <input type="date" id="rango-hasta" class="px-3 py-1.5 rounded-lg border t-input text-sm" />
+        </section>
+
+        <section class="t-card border rounded-xl px-4 py-3 mb-5 flex justify-between text-sm">
+          <span class="t-text-soft">Total en este filtro:</span>
+          <span id="filtro-total" class="font-bold">$0.00</span>
+        </section>
+
+        <section id="historial-list" class="space-y-5"></section>
+
+        <div id="historial-empty" class="text-center py-16 hidden">
+          <p class="text-4xl mb-3">📭</p>
+          <p class="font-medium t-text-soft">No hay transacciones en este filtro</p>
+          <p class="text-sm t-text-faint mt-1">Agrega un movimiento o cambia los filtros para ver resultados.</p>
+        </div>
+
+      </section>
+
+      <!-- ===================== VISTA: CATEGORÍAS ===================== -->
+      <section id="view-categorias" class="view">
+
+        <section class="mb-6 flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-extrabold tracking-tight">Categorías</h1>
+            <p class="text-sm t-text-soft"><span id="categorias-count">0</span> categorías creadas</p>
+          </div>
+          <button id="btn-nueva-categoria" class="px-4 py-2 rounded-xl t-btn-primary text-sm font-medium transition">
+            + Nueva
+          </button>
+        </section>
+
+        <section class="space-y-2 mb-8" id="categorias-list"></section>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- BOTÓN FLOTANTE AGREGAR -->
+  <button id="btn-add-fab" class="fixed bottom-20 md:bottom-8 right-6 w-14 h-14 rounded-full t-btn-primary text-2xl shadow-lg flex items-center justify-center transition">
+    +
+  </button>
+
+  <!-- NAV INFERIOR (móvil) -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 t-card border-t flex justify-around py-3" id="mobile-nav">
+    <button data-view="dashboard" class="nav-link-mobile flex flex-col items-center text-xs gap-1 t-text-faint">📊 Dashboard</button>
+    <button data-view="historial" class="nav-link-mobile flex flex-col items-center text-xs gap-1 t-text-faint">📋 Historial</button>
+    <button data-view="categorias" class="nav-link-mobile flex flex-col items-center text-xs gap-1 t-text-faint">🏷️ Categorías</button>
+  </nav>
+
+  <!-- ===================== MODAL: TRANSACCIÓN ===================== -->
+  <div id="modal-transaccion" class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm items-center justify-center p-4 z-50">
+    <div class="relative t-modal-card rounded-2xl shadow-xl w-full max-w-sm p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h2 id="modal-transaccion-titulo" class="text-lg font-bold">Nueva transacción</h2>
+        <button id="btn-cerrar-modal-transaccion" class="t-text-faint hover:opacity-70 text-lg">✕</button>
+      </div>
+
+      <input type="hidden" id="txn-id" value="">
+
+      <div class="flex t-hover rounded-xl p-1 mb-5" style="background:var(--bg-hover)">
+        <button type="button" data-tipo="gasto" id="btn-tipo-gasto" class="flex-1 py-2 rounded-lg text-sm font-semibold transition">Gasto</button>
+        <button type="button" data-tipo="ingreso" id="btn-tipo-ingreso" class="flex-1 py-2 rounded-lg text-sm font-medium transition">Ingreso</button>
+      </div>
+
+      <label class="block text-sm font-medium mb-1">Monto</label>
+      <div class="relative mb-1">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 t-text-faint">$</span>
+        <input type="number" step="0.01" id="txn-monto" placeholder="0.00"
+          class="w-full pl-7 pr-3 py-2.5 rounded-lg border t-input text-sm focus:ring-2 focus:ring-gray-900" />
+      </div>
+      <p id="error-monto" class="text-xs text-red-500 mb-4 hidden">El monto debe ser mayor a $0.00</p>
+
+      <label class="block text-sm font-medium mb-1">Categoría</label>
+      <select id="txn-categoria" class="w-full px-3 py-2.5 rounded-lg border t-input text-sm mb-1 focus:ring-2 focus:ring-gray-900">
+        <option value="">Selecciona una categoría</option>
+      </select>
+      <p id="error-categoria" class="text-xs text-red-500 mb-4 hidden">Debes elegir una categoría</p>
+
+      <label class="block text-sm font-medium mb-1">Fecha</label>
+      <input type="date" id="txn-fecha" class="w-full px-3 py-2.5 rounded-lg border t-input text-sm mb-1 focus:ring-2 focus:ring-gray-900" />
+      <p id="error-fecha" class="text-xs text-red-500 mb-4 hidden">La fecha es obligatoria</p>
+
+      <label class="block text-sm font-medium mb-1">Nota <span class="t-text-faint font-normal">(opcional)</span></label>
+      <input type="text" id="txn-nota" placeholder="Ej: Almuerzo con cliente" maxlength="100"
+        class="w-full px-3 py-2.5 rounded-lg border t-input text-sm mb-6 focus:ring-2 focus:ring-gray-900" />
+
+      <div class="flex gap-2">
+        <button type="button" id="btn-cancelar-transaccion" class="flex-1 px-4 py-2.5 rounded-xl border t-border t-hover text-sm font-medium">Cancelar</button>
+        <button type="button" id="btn-guardar-transaccion" class="flex-1 px-4 py-2.5 rounded-xl t-btn-primary text-sm font-medium">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: CATEGORÍA ===================== -->
+  <div id="modal-categoria" class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm items-center justify-center p-4 z-50">
+    <div class="relative t-modal-card rounded-2xl shadow-xl w-full max-w-sm p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h2 id="modal-categoria-titulo" class="text-lg font-bold">Nueva categoría</h2>
+        <button id="btn-cerrar-modal-categoria" class="t-text-faint hover:opacity-70 text-lg">✕</button>
+      </div>
+
+      <input type="hidden" id="cat-id" value="">
+
+      <label class="block text-sm font-medium mb-1">Nombre</label>
+      <input type="text" id="cat-nombre" placeholder="Ej: Suscripciones" maxlength="20"
+        class="w-full px-3 py-2 rounded-lg border t-input text-sm mb-1 focus:ring-2 focus:ring-gray-900" />
+      <p id="error-cat-nombre" class="text-xs text-red-500 mb-4 hidden">El nombre no puede estar vacío</p>
+
+      <label class="block text-sm font-medium mb-1">Color</label>
+      <div class="flex gap-2 mb-4" id="color-picker"></div>
+
+      <label class="block text-sm font-medium mb-1">Ícono</label>
+      <div class="flex gap-2 flex-wrap mb-5" id="icono-picker"></div>
+
+      <label class="block text-sm font-medium mb-1">Grupo (regla 50/30/20)</label>
+      <div class="flex gap-2 mb-1" id="grupo-picker"></div>
+      <p class="text-xs t-text-faint mb-5">¿Esta categoría es una necesidad, parte de tu estilo de vida, o ahorro?</p>
+
+      <div class="flex gap-2">
+        <button type="button" id="btn-cancelar-categoria" class="flex-1 px-4 py-2 rounded-xl border t-border t-hover text-sm font-medium">Cancelar</button>
+        <button type="button" id="btn-guardar-categoria" class="flex-1 px-4 py-2 rounded-xl t-btn-primary text-sm font-medium">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: CONFIRMAR ELIMINAR ===================== -->
+  <div id="modal-confirmar" class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm items-center justify-center p-4 z-50">
+    <div class="relative t-modal-card rounded-2xl shadow-xl w-full max-w-xs p-6 text-center">
+      <p class="text-3xl mb-2">🗑️</p>
+      <p id="confirmar-texto" class="text-sm t-text-soft mb-5">¿Eliminar este elemento? Esta acción no se puede deshacer.</p>
+      <div class="flex gap-2">
+        <button id="btn-cancelar-confirmar" class="flex-1 px-4 py-2 rounded-xl border t-border t-hover text-sm font-medium">Cancelar</button>
+        <button id="btn-confirmar-eliminar" class="flex-1 px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: META DE AHORRO ===================== -->
+  <div id="modal-meta" class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm items-center justify-center p-4 z-50">
+    <div class="relative t-modal-card rounded-2xl shadow-xl w-full max-w-sm p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h2 id="modal-meta-titulo" class="text-lg font-bold">Nueva meta de ahorro</h2>
+        <button id="btn-cerrar-modal-meta" class="t-text-faint hover:opacity-70 text-lg">✕</button>
+      </div>
+
+      <label class="block text-sm font-medium mb-1">¿Para qué estás ahorrando?</label>
+      <input type="text" id="meta-input-nombre" placeholder="Ej: Moto, Viaje, Fondo de emergencia" maxlength="40"
+        class="w-full px-3 py-2.5 rounded-lg border t-input text-sm mb-1 focus:ring-2 focus:ring-gray-900" />
+      <p id="error-meta-nombre" class="text-xs text-red-500 mb-4 hidden">Dale un nombre a tu meta</p>
+
+      <label class="block text-sm font-medium mb-1">Monto objetivo</label>
+      <div class="relative mb-1">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 t-text-faint">$</span>
+        <input type="number" step="0.01" id="meta-input-objetivo" placeholder="1200.00"
+          class="w-full pl-7 pr-3 py-2.5 rounded-lg border t-input text-sm focus:ring-2 focus:ring-gray-900" />
+      </div>
+      <p id="error-meta-objetivo" class="text-xs text-red-500 mb-4 hidden">El monto debe ser mayor a $0.00</p>
+
+      <label class="block text-sm font-medium mb-1">Monto ahorrado <span class="t-text-faint font-normal">(puedes corregirlo aquí)</span></label>
+      <div class="relative mb-1">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 t-text-faint">$</span>
+        <input type="number" step="0.01" id="meta-input-actual" placeholder="0.00"
+          class="w-full pl-7 pr-3 py-2.5 rounded-lg border t-input text-sm focus:ring-2 focus:ring-gray-900" />
+      </div>
+      <p id="error-meta-actual" class="text-xs text-red-500 mb-4 hidden">No puede ser negativo</p>
+
+      <label class="block text-sm font-medium mb-1">Fecha límite <span class="t-text-faint font-normal">(opcional)</span></label>
+      <input type="date" id="meta-input-fecha"
+        class="w-full px-3 py-2.5 rounded-lg border t-input text-sm mb-6 focus:ring-2 focus:ring-gray-900" />
+
+      <div class="flex gap-2">
+        <button type="button" id="btn-cancelar-meta" class="flex-1 px-4 py-2.5 rounded-xl border t-border t-hover text-sm font-medium">Cancelar</button>
+        <button type="button" id="btn-guardar-meta" class="flex-1 px-4 py-2.5 rounded-xl t-btn-primary text-sm font-medium">Guardar</button>
+      </div>
+
+      <div class="flex items-center justify-center gap-3 mt-4">
+        <button type="button" id="btn-reiniciar-meta" class="text-xs t-text-faint hover:opacity-70 hidden">↺ Reiniciar ahorro a $0</button>
+        <span id="separador-acciones-meta" class="text-xs t-text-faint hidden">·</span>
+        <button type="button" id="btn-borrar-meta" class="text-xs text-red-500 hover:opacity-70 hidden">Eliminar esta meta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: CONFIRMAR AHORRO AUTOMÁTICO ===================== -->
+  <div id="modal-ahorro-auto" class="modal-overlay fixed inset-0 bg-black/40 backdrop-blur-sm items-center justify-center p-4 z-50">
+    <div class="relative t-modal-card rounded-2xl shadow-xl w-full max-w-xs p-6 text-center">
+      <p class="text-3xl mb-2">🐷</p>
+      <p class="text-sm mb-1">¡Bien! Acabas de registrar un ingreso.</p>
+      <p id="ahorro-auto-texto" class="text-sm t-text-soft mb-5">¿Separamos <span id="ahorro-auto-monto" class="font-semibold t-text"></span> (<span id="ahorro-auto-porcentaje"></span>%) para tu meta?</p>
+      <div class="flex gap-2">
+        <button id="btn-rechazar-ahorro-auto" class="flex-1 px-4 py-2 rounded-xl border t-border t-hover text-sm font-medium">No, gracias</button>
+        <button id="btn-aceptar-ahorro-auto" class="flex-1 px-4 py-2 rounded-xl t-btn-primary text-sm font-medium">Sí, apartar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST DE CONFIRMACIÓN -->
+  <div id="toast" class="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 t-toast text-sm px-4 py-2.5 rounded-xl shadow-lg opacity-0 pointer-events-none transition-opacity z-50"></div>
+
+
+  <script src="app.js"></script>
+</body>
+</html>
