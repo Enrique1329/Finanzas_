@@ -29,6 +29,10 @@ const SYNC_KEYS = [
 let modoRegistro = false;
 let sincronizando = false; // evita loops al escribir datos que vienen de la nube
 
+// Todo lo que toca el DOM espera a que la página termine de cargar,
+// así no importa en qué orden estén los <script> ni el modal en el HTML.
+window.addEventListener("DOMContentLoaded", () => {
+
 // ---------- Elementos ----------
 const btnAbrirLogin = document.getElementById("btn-abrir-login");
 const loginStatusText = document.getElementById("login-status-text");
@@ -219,3 +223,5 @@ auth.onAuthStateChanged(async (user) => {
     loginStatusText.textContent = "Iniciar sesión";
   }
 });
+
+}); // fin DOMContentLoaded
