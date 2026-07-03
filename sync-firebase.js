@@ -215,12 +215,15 @@ auth.onAuthStateChanged(async (user) => {
     const teniaDatosRemotos = await descargarDatosDeNube(user.uid);
     if (!teniaDatosRemotos) {
       await subirDatosANube(user.uid);
-    } else {
-      // Recarga para que app.js, cuentas.js, etc. rendericen con los datos bajados
+    } else if (!sessionStorage.getItem("finanzas_sync_hecho")) {
+      // Solo recarga UNA vez por sesión de navegador, para que
+      // app.js/cuentas.js rendericen con los datos bajados de la nube.
+      sessionStorage.setItem("finanzas_sync_hecho", "1");
       location.reload();
     }
   } else {
     loginStatusText.textContent = "Iniciar sesión";
+    sessionStorage.removeItem("finanzas_sync_hecho");
   }
 });
 
