@@ -59,30 +59,41 @@ async function subirDatos() {
       actualizadoEn: firebase.firestore.FieldValue.serverTimestamp()
     });
     ultimoHashSubido = hash;
-    marcarEstadoSync('☁️ Sincronizado');
+    marcarEstadoSync('Sincronizado ✓');
   } catch (e) {
     console.error('Error subiendo a Firebase:', e);
     marcarEstadoSync('⚠️ Error al sincronizar');
   }
 }
 
-// Compara la nube contra lo local; si hay diferencias, adopta la nube
-// y recarga UNA vez (después de recargar ya van a coincidir, así que
-// no se genera un loop).
-async function descargarYSincronizar() {
-  const doc = await db.collection('usuarios').doc(usuarioActual.uid).get();
-  if (!doc.exists || !doc.data().datos) {
-    await subirDatos(); // primera vez: la nube no tiene nada, subimos lo local
+// SOLO adopta los datos de la nube automáticamente si este dispositivo
+// está "vacío" (nunca usó la app). Si ya hay datos locales, NO los pisa
+// solo ni recarga la página — evita cualquier loop de recargas.
+// Para traer la nube a propósito (ej. cambiaste de celular) está el
+// botón "Traer de la nube" en el menú de cuenta.
+async function chequearPrimerIngreso() {
+  const yaTieneDatosLocales = localStorage.getItem('gastos_app_transacciones') !== null;
+  if (yaTieneDatosLocales) {
+    ultimoHashSubido = null; // fuerza a comparar/subir en el próximo subirDatos()
     return;
   }
-  const datosNube = doc.data().datos;
-  const datosLocales = leerTodoLocalStorage();
-  if (JSON.stringify(datosNube) !== JSON.stringify(datosLocales)) {
-    escribirTodoLocalStorage(datosNube);
-    ultimoHashSubido = JSON.stringify(datosNube);
+  const doc = await db.collection('usuarios').doc(usuarioActual.uid).get();
+  if (doc.exists && doc.data().datos) {
+    escribirTodoLocalStorage(doc.data().datos);
+    location.reload(); // única vez: dispositivo nuevo adoptando datos existentes
+  }
+}
+
+async function traerDeLaNubeManual() {
+  if (!usuarioActual) return;
+  const ok = confirm('Esto va a reemplazar los datos de este dispositivo con los que están guardados en la nube. ¿Continuar?');
+  if (!ok) return;
+  const doc = await db.collection('usuarios').doc(usuarioActual.uid).get();
+  if (doc.exists && doc.data().datos) {
+    escribirTodoLocalStorage(doc.data().datos);
     location.reload();
   } else {
-    ultimoHashSubido = JSON.stringify(datosLocales);
+    alert('Todavía no hay nada guardado en la nube para esta cuenta.');
   }
 }
 
@@ -136,43 +147,46 @@ function quitarOverlayLogin() {
   if (overlay) overlay.remove();
 }
 
-// Botón de cuenta/cerrar sesión, visible en escritorio (sidebar) Y en
-// móvil normal (barra superior), sin depender de "Sitio de escritorio".
-function inicializarUISync() {
-  // Desktop: dentro del sidebar
-  if (!document.getElementById('sync-estado')) {
-    const cont = document.querySelector('aside .mt-auto');
-    if (cont) {
-      const bloque = document.createElement('div');
-      bloque.style.cssText = 'margin-top:12px;padding-top:12px;border-top:1px solid var(--border)';
-      bloque.innerHTML = `
-        <p id="sync-estado" class="text-xs t-text-faint mb-2">☁️ Conectado</p>
-        <button id="btn-sync-ahora" class="text-xs t-text-faint hover:opacity-70 mr-3">🔄 Sincronizar</button>
-        <button id="btn-cerrar-sesion" class="text-xs t-text-faint hover:opacity-70">Cerrar sesión</button>`;
-      cont.appendChild(bloque);
-      document.getElementById('btn-cerrar-sesion').addEventListener('click', () => auth.signOut());
-      document.getElementById('btn-sync-ahora').addEventListener('click', () => {
-        ultimoHashSubido = null;
-        subirDatos();
-      });
-    }
-  }
+// -------------------------------------------------------------
+// Botón de cuenta ÚNICO, fijo en pantalla — igual en cualquier
+// pestaña (Dashboard/Historial/Categorías) y en cualquier tamaño.
+// -------------------------------------------------------------
+function crearBotonCuenta() {
+  if (document.getElementById('btn-cuenta-flotante')) return;
 
-  // Móvil: un botón compacto en la barra superior (junto a exportar/importar)
-  if (!document.getElementById('btn-cuenta-mobile')) {
-    const contMobile = document.getElementById('btn-exportar-mobile')?.parentElement;
-    if (contMobile) {
-      const btn = document.createElement('button');
-      btn.id = 'btn-cuenta-mobile';
-      btn.className = 'text-xs t-text-soft t-hover px-2 py-1.5 rounded-lg border t-border';
-      btn.textContent = '☁️';
-      btn.addEventListener('click', () => {
-        const salir = confirm(`Conectado como ${usuarioActual.email}\n\n¿Cerrar sesión?`);
-        if (salir) auth.signOut();
-      });
-      contMobile.appendChild(btn);
-    }
-  }
+  const btn = document.createElement('button');
+  btn.id = 'btn-cuenta-flotante';
+  btn.textContent = '👤';
+  btn.style.cssText = 'position:fixed;top:12px;right:12px;z-index:9998;width:38px;height:38px;border-radius:9999px;border:1px solid var(--border,#3A3A3D);background:var(--bg-card,#2A2A2D);color:var(--text,#ECECEC);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.25);';
+  document.body.appendChild(btn);
+
+  const menu = document.createElement('div');
+  menu.id = 'menu-cuenta-flotante';
+  menu.style.cssText = 'position:fixed;top:56px;right:12px;z-index:9998;background:var(--bg-card,#2A2A2D);border:1px solid var(--border,#3A3A3D);border-radius:12px;padding:10px;min-width:180px;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-family:Inter,-apple-system,sans-serif;';
+  menu.innerHTML = `
+    <p id="sync-estado" style="font-size:12px;color:var(--text-soft,#A3A3A6);margin-bottom:8px;word-break:break-all;"></p>
+    <button id="btn-sync-ahora" style="display:block;width:100%;text-align:left;font-size:12px;color:var(--text,#ECECEC);background:none;border:none;padding:6px 0;cursor:pointer;">🔄 Sincronizar ahora</button>
+    <button id="btn-traer-nube" style="display:block;width:100%;text-align:left;font-size:12px;color:var(--text,#ECECEC);background:none;border:none;padding:6px 0;cursor:pointer;">⬇️ Traer de la nube</button>
+    <button id="btn-cerrar-sesion" style="display:block;width:100%;text-align:left;font-size:12px;color:var(--accent-gasto,#F87171);background:none;border:none;padding:6px 0;cursor:pointer;">Cerrar sesión</button>`;
+  document.body.appendChild(menu);
+
+  btn.addEventListener('click', () => {
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  });
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target) && e.target !== btn) menu.style.display = 'none';
+  });
+  document.getElementById('btn-sync-ahora').addEventListener('click', () => {
+    ultimoHashSubido = null;
+    subirDatos();
+  });
+  document.getElementById('btn-traer-nube').addEventListener('click', traerDeLaNubeManual);
+  document.getElementById('btn-cerrar-sesion').addEventListener('click', () => auth.signOut());
+}
+
+function quitarBotonCuenta() {
+  document.getElementById('btn-cuenta-flotante')?.remove();
+  document.getElementById('menu-cuenta-flotante')?.remove();
 }
 
 // -------------------------------------------------------------
@@ -182,15 +196,18 @@ auth.onAuthStateChanged(async (user) => {
   if (user) {
     usuarioActual = user;
     quitarOverlayLogin();
-    await descargarYSincronizar();
-    inicializarUISync();
+    await chequearPrimerIngreso();
+    crearBotonCuenta();
+    marcarEstadoSync(usuarioActual.email);
   } else {
     usuarioActual = null;
+    quitarBotonCuenta();
     crearOverlayLogin();
   }
 });
 
-// Autosync: cada 20s si hubo cambios, y al ocultar/cerrar la pestaña
+// Autosync silencioso: cada 20s si hubo cambios, y al ocultar/cerrar
+// la pestaña. Nunca recarga la página por su cuenta.
 setInterval(subirDatos, 20000);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') subirDatos();
