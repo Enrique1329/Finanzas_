@@ -192,14 +192,9 @@ function crearBotonCuenta() {
   // Escritorio: al final del sidebar (solo si existe ese layout)
   const contDesktop = document.querySelector('aside .mt-auto');
   if (contDesktop) {
-    const bloque = document.createElement('div');
-    bloque.style.cssText = 'margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;';
-    bloque.appendChild(crearBoton());
-    const label = document.createElement('span');
-    label.className = 'text-xs t-text-faint';
-    label.textContent = 'Cuenta';
-    bloque.appendChild(label);
-    contDesktop.appendChild(bloque);
+    const btnDesktop = crearBoton();
+    btnDesktop.style.marginTop = '12px';
+    contDesktop.appendChild(btnDesktop);
   }
 
   document.addEventListener('click', (e) => {
