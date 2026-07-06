@@ -148,21 +148,22 @@ function quitarOverlayLogin() {
 }
 
 // -------------------------------------------------------------
-// Botón de cuenta ÚNICO, fijo en pantalla — igual en cualquier
-// pestaña (Dashboard/Historial/Categorías) y en cualquier tamaño.
+// Botón de cuenta ÚNICO — insertado junto a los íconos de
+// exportar/importar (móvil Y escritorio), no flotante. El menú se
+// posiciona solo, debajo de donde esté el botón.
 // -------------------------------------------------------------
-function crearBotonCuenta() {
-  if (document.getElementById('btn-cuenta-flotante')) return;
+function posicionarMenu(btn, menu) {
+  const r = btn.getBoundingClientRect();
+  menu.style.top = `${r.bottom + 6}px`;
+  menu.style.right = `${window.innerWidth - r.right}px`;
+}
 
-  const btn = document.createElement('button');
-  btn.id = 'btn-cuenta-flotante';
-  btn.textContent = '👤';
-  btn.style.cssText = 'position:fixed;top:12px;right:12px;z-index:9998;width:38px;height:38px;border-radius:9999px;border:1px solid var(--border,#3A3A3D);background:var(--bg-card,#2A2A2D);color:var(--text,#ECECEC);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.25);';
-  document.body.appendChild(btn);
+function crearBotonCuenta() {
+  if (document.querySelector('.btn-cuenta-flotante')) return;
 
   const menu = document.createElement('div');
   menu.id = 'menu-cuenta-flotante';
-  menu.style.cssText = 'position:fixed;top:56px;right:12px;z-index:9998;background:var(--bg-card,#2A2A2D);border:1px solid var(--border,#3A3A3D);border-radius:12px;padding:10px;min-width:180px;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-family:Inter,-apple-system,sans-serif;';
+  menu.style.cssText = 'position:fixed;z-index:9998;background:var(--bg-card,#2A2A2D);border:1px solid var(--border,#3A3A3D);border-radius:12px;padding:10px;min-width:190px;display:none;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-family:Inter,-apple-system,sans-serif;';
   menu.innerHTML = `
     <p id="sync-estado" style="font-size:12px;color:var(--text-soft,#A3A3A6);margin-bottom:8px;word-break:break-all;"></p>
     <button id="btn-sync-ahora" style="display:block;width:100%;text-align:left;font-size:12px;color:var(--text,#ECECEC);background:none;border:none;padding:6px 0;cursor:pointer;">🔄 Sincronizar ahora</button>
@@ -170,12 +171,42 @@ function crearBotonCuenta() {
     <button id="btn-cerrar-sesion" style="display:block;width:100%;text-align:left;font-size:12px;color:var(--accent-gasto,#F87171);background:none;border:none;padding:6px 0;cursor:pointer;">Cerrar sesión</button>`;
   document.body.appendChild(menu);
 
-  btn.addEventListener('click', () => {
-    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-  });
+  function crearBoton() {
+    const btn = document.createElement('button');
+    btn.className = 'btn-cuenta-flotante text-xs t-text-soft t-hover px-2 py-1.5 rounded-lg border t-border';
+    btn.textContent = '👤';
+    btn.style.cssText += 'border-radius:9999px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const abierto = menu.style.display === 'block';
+      if (!abierto) posicionarMenu(btn, menu);
+      menu.style.display = abierto ? 'none' : 'block';
+    });
+    return btn;
+  }
+
+  // Móvil: junto a los íconos de exportar/importar de la barra superior
+  const contMobile = document.getElementById('btn-exportar-mobile')?.parentElement;
+  if (contMobile) contMobile.insertBefore(crearBoton(), contMobile.firstChild);
+
+  // Escritorio: al final del sidebar (solo si existe ese layout)
+  const contDesktop = document.querySelector('aside .mt-auto');
+  if (contDesktop) {
+    const bloque = document.createElement('div');
+    bloque.style.cssText = 'margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;';
+    bloque.appendChild(crearBoton());
+    const label = document.createElement('span');
+    label.className = 'text-xs t-text-faint';
+    label.textContent = 'Cuenta';
+    bloque.appendChild(label);
+    contDesktop.appendChild(bloque);
+  }
+
   document.addEventListener('click', (e) => {
-    if (!menu.contains(e.target) && e.target !== btn) menu.style.display = 'none';
+    if (!menu.contains(e.target) && !e.target.classList.contains('btn-cuenta-flotante')) menu.style.display = 'none';
   });
+  window.addEventListener('resize', () => { menu.style.display = 'none'; });
+
   document.getElementById('btn-sync-ahora').addEventListener('click', () => {
     ultimoHashSubido = null;
     subirDatos();
@@ -185,7 +216,7 @@ function crearBotonCuenta() {
 }
 
 function quitarBotonCuenta() {
-  document.getElementById('btn-cuenta-flotante')?.remove();
+  document.querySelectorAll('.btn-cuenta-flotante').forEach(el => el.remove());
   document.getElementById('menu-cuenta-flotante')?.remove();
 }
 
