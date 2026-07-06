@@ -154,8 +154,15 @@ function quitarOverlayLogin() {
 // -------------------------------------------------------------
 function posicionarMenu(btn, menu) {
   const r = btn.getBoundingClientRect();
-  menu.style.top = `${r.bottom + 6}px`;
-  menu.style.right = `${window.innerWidth - r.right}px`;
+  const espacioAbajo = window.innerHeight - r.bottom;
+  menu.style.bottom = '';
+  menu.style.top = '';
+  if (espacioAbajo < 180) {
+    menu.style.bottom = `${window.innerHeight - r.top + 6}px`;
+  } else {
+    menu.style.top = `${r.bottom + 6}px`;
+  }
+  menu.style.right = `${Math.max(8, window.innerWidth - r.right)}px`;
 }
 
 function crearBotonCuenta() {
@@ -219,15 +226,15 @@ function quitarBotonCuenta() {
 // FLUJO PRINCIPAL
 // -------------------------------------------------------------
 auth.onAuthStateChanged(async (user) => {
+  quitarOverlayLogin();
+  quitarBotonCuenta();
   if (user) {
     usuarioActual = user;
-    quitarOverlayLogin();
     await chequearPrimerIngreso();
     crearBotonCuenta();
     marcarEstadoSync(usuarioActual.email);
   } else {
     usuarioActual = null;
-    quitarBotonCuenta();
     crearOverlayLogin();
   }
 });
