@@ -236,6 +236,14 @@ function quitarBotonCuenta() {
 // -------------------------------------------------------------
 // FLUJO PRINCIPAL
 // -------------------------------------------------------------
+function purgarBotonesIntrusos() {
+  document.querySelectorAll('button,a,span,div,p').forEach(el => {
+    if (el.closest('#auth-overlay') || el.closest('#menu-cuenta-flotante')) return;
+    if (el.children.length === 0 && el.textContent.trim() === 'Iniciar sesión') el.remove();
+  });
+}
+new MutationObserver(purgarBotonesIntrusos).observe(document.body, { childList: true, subtree: true });
+
 auth.onAuthStateChanged(async (user) => {
   quitarOverlayLogin();
   quitarBotonCuenta();
