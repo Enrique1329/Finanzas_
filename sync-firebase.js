@@ -154,15 +154,26 @@ function quitarOverlayLogin() {
 // -------------------------------------------------------------
 function posicionarMenu(btn, menu) {
   const r = btn.getBoundingClientRect();
-  const espacioAbajo = window.innerHeight - r.bottom;
-  menu.style.bottom = '';
+  const ANCHO_MENU = 200;
+  const ALTO_MENU_ESTIMADO = 170;
+
+  // Vertical: abre hacia abajo si hay espacio, si no hacia arriba
   menu.style.top = '';
-  if (espacioAbajo < 180) {
-    menu.style.bottom = `${window.innerHeight - r.top + 6}px`;
+  menu.style.bottom = '';
+  if (window.innerHeight - r.bottom < ALTO_MENU_ESTIMADO) {
+    menu.style.bottom = `${Math.max(8, window.innerHeight - r.top + 6)}px`;
   } else {
     menu.style.top = `${r.bottom + 6}px`;
   }
-  menu.style.right = `${Math.max(8, window.innerWidth - r.right)}px`;
+
+  // Horizontal: abre hacia la derecha si hay espacio, si no hacia la izquierda
+  menu.style.left = '';
+  menu.style.right = '';
+  if (r.left + ANCHO_MENU < window.innerWidth) {
+    menu.style.left = `${r.left}px`;
+  } else {
+    menu.style.right = `${Math.max(8, window.innerWidth - r.right)}px`;
+  }
 }
 
 function crearBotonCuenta() {
