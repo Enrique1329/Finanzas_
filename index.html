@@ -153,9 +153,6 @@
           <button id="btn-instalar-app" class="hidden flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium t-hover t-text-soft">
             <span>📲</span> Instalar app
           </button>
-          <button id="btn-abrir-login" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium t-hover t-text-soft">
-          <span>👤</span> <span id="login-status-text">Iniciar sesión</span>
-          </button>
         </div>
       </div>
     </aside>
@@ -554,35 +551,6 @@
   <script src="recordatorios.js"></script>
   <script src="cuentas.js"></script>
   <script src="sync-firebase.js"></script>
-  <div id="modal-login" class="modal-overlay fixed inset-0 bg-black/50 items-center justify-center p-4 z-50">
-  <div class="t-card rounded-2xl shadow-xl w-full max-w-sm p-6">
-  <div class="flex items-center justify-between mb-5">
-  <h2 class="text-lg font-bold" id="login-titulo">Iniciar sesión</h2>
-  <button id="btn-cerrar-login" class="text-gray-400 hover:text-gray-900 text-lg">✕</button>
-  </div>
 
-  <div id="login-error" class="hidden text-xs text-red-500 mb-3"></div>
-
-  <label class="block text-sm font-medium mb-1">Correo</label>
-  <input type="email" id="login-email" class="w-full px-3 py-2.5 rounded-lg border t-input text-sm mb-4" placeholder="tu@correo.com" />
-
-  <label class="block text-sm font-medium mb-1">Contraseña</label>
-  <input type="password" id="login-password" class="w-full px-3 py-2.5 rounded-lg border t-input text-sm mb-4" placeholder="Mínimo 6 caracteres" />
-
-  <button id="btn-login-submit" class="w-full px-4 py-2.5 rounded-xl t-btn-primary text-sm font-medium mb-3">
-      Iniciar sesión
-  </button>
-
-  <p class="text-xs text-center t-text-faint">
-      ¿No tienes cuenta?
-  <button id="btn-toggle-registro" class="underline font-medium">Regístrate</button>
-  </p>
-
-  <button id="btn-logout" class="hidden w-full px-4 py-2.5 rounded-xl border text-sm font-medium mt-3">
-      Cerrar sesión
-  </button>
-  </div>
-</div>
-  
 </body>
 </html>
